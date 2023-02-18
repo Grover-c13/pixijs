@@ -302,4 +302,39 @@ describe('EventBoundary', () =>
         expect(containerOutSpy).toHaveBeenCalledOnce();
         expect(toOverSpy).toHaveBeenCalledOnce();
     });
+
+    it('should fire right-click event when using a pointer type of mouse and button 2', () =>
+    {
+        const stage = new Container();
+        const boundary = new EventBoundary(stage);
+        const container = stage.addChild(new Container());
+
+        const target = container.addChild(
+            new Graphics().drawRect(150, 0, 100, 100)
+        );
+
+        const event = new FederatedPointerEvent(boundary);
+
+        target.interactive = true;
+        container.interactive = true;
+
+        event.target = target;
+        event.global.set(175, 50);
+        event.type = 'rightclick';
+        event.pointerType = 'mouse';
+        event.button = 2;
+
+        const federatedSpy = jest.fn();
+
+        target.onrightclick = federatedSpy;
+
+        const eventListenerSpy = jest.fn();
+
+        target.addEventListener('rightclick', eventListenerSpy);
+
+        boundary.dispatchEvent(event);
+
+        expect(federatedSpy).toBeCalled();
+        expect(eventListenerSpy).toBeCalled();
+    });
 });
